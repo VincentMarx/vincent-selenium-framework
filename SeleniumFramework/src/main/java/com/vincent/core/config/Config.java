@@ -22,7 +22,7 @@ public class Config {
 
 	public static String dataPath = "";
 
-	public static String outputPath = "output";
+	public static String outputRootPath = "output";
 
 	public static String driverPath = "driver/";
 

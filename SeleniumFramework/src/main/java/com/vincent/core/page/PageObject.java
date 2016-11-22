@@ -1,17 +1,14 @@
 package com.vincent.core.page;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.WebDriver;
 
-import com.vincent.core.report.Report;
+import com.vincent.core.execution.Context;
 
 public abstract class PageObject {
 	protected static final Log log = LogFactory.getLog(PageObject.class);
-	protected Report report;
-	protected Map<String, String> data;
+	protected Context context;
 	/*
 	 * Open a new browser
 	 */
@@ -21,20 +18,12 @@ public abstract class PageObject {
 		return driver;
 	}
 
-	public Report getReport() {
-		return report;
+	public Context getContext() {
+		return context;
 	}
 
-	public void setReport(Report report) {
-		this.report = report;
-	}
-
-	public Map<String, String> getData() {
-		return data;
-	}
-
-	public void setData(Map<String, String> data) {
-		this.data = data;
+	public void setContext(Context context) {
+		this.context = context;
 	}
 
 	// protected String getValue(String fieldName) {
