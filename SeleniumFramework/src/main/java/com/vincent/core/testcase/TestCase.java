@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TestCase {
 	private String testCaseName;
-	private boolean isChecked = false;
+	private boolean isChecked = true;
 	private int runs;
 	private Status status;
 	private List<TestStep> testSteps;

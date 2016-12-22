@@ -43,6 +43,9 @@ public class ExcelData {
 
 	public void loadTestCase() {
 		File dataFile = new File(dataFilePath);
+		if (!dataFile.exists()) {
+			log.error("data file: " + dataFilePath + " does not exist.");
+		}
 		if (lastModified != dataFile.lastModified()) {
 			List<TestCase> testCaseList = loadTestCase(dataFile);
 			log.debug("Total number of TestCase : " + testCaseList.size());
@@ -243,11 +246,11 @@ public class ExcelData {
 	}
 
 	public static void main(String[] args) {
-		String dataFilePath = "E:/Working/workspace/mytesting/dataFiles/MavenCentralRepository.xls";
+		String dataFilePath = "dataFiles/MavenCentralRepository.xls";
 		ExcelData excelData = new ExcelData(dataFilePath);
 		excelData.loadTestCase();
 		for (TestCase testCase : excelData.getTestSet()) {
-			// System.out.println(testCase);
+			System.out.println(testCase);
 		}
 	}
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.vincent.core.data.ExcelData;
 import com.vincent.core.page.PageLoader;
 import com.vincent.core.page.PageObject;
 import com.vincent.core.report.Report;
@@ -100,11 +101,6 @@ public class ExecutionService {
 		}
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public String getOutputPath() {
 		return outputPath;
 	}
@@ -127,6 +123,17 @@ public class ExecutionService {
 
 	public void setIsStop(AtomicBoolean isStop) {
 		this.isStop = isStop;
+	}
+
+	public static void main(String[] args) {
+		String dataFilePath = "dataFiles/MavenCentralRepository.xls";
+		ExcelData excelData = new ExcelData(dataFilePath);
+		excelData.loadTestCase();
+
+		ExecutionService executionService = new ExecutionService(dataFilePath);
+
+		executionService.executeTestSet(excelData.getTestSet());
+
 	}
 
 }

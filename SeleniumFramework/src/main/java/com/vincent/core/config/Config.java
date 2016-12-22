@@ -9,7 +9,6 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
@@ -26,16 +25,18 @@ public class Config {
 
 	public static String driverPath = "driver/";
 
-	public static String browserType = "firefox";
+	public static BrowserType browserType = BrowserType.Firefox;
 
 	public static String webDriver = "local";
 
 	public static String remoteWebDriverUrl = "http://localhost:4444/wd/hub";
 
+	public static String pagePackage = "com.test.page";
+
 	// for fire fox
 	public static String firefoxPath;
 
-	public static String firefoxProfile = "selenium";
+	public static String firefoxProfile = "firefoxProfile/exr6bzi9.testprofile";
 
 	// for IE
 	public static String IEDriverPath = driverPath + "IEDriverServer.exe";
@@ -94,10 +95,10 @@ public class Config {
 			try {
 
 				Element root = reader.read(pomFile).getRootElement();
-				pomGroupId = root.selectSingleNode("//project/groupId").getText();
-				pomArtifactId = root.selectSingleNode("//project/artifactId").getText();
+				pomGroupId = root.element("groupId").getText();
+				pomArtifactId = root.element("artifactId").getText();
 				log.info("pomGroupId = " + pomGroupId + ", pomArtifactId = " + pomArtifactId);
-			} catch (DocumentException e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		}
@@ -143,36 +144,37 @@ public class Config {
 			}
 
 			if (StringUtils.isNotBlank(fieldValue)) {
-				Class<?> fieldType = field.getType();
-				// String field
-				if (fieldType.isAssignableFrom(String.class)) {
-					try {
+				try {
+					Class<?> fieldType = field.getType();
+					// String field
+					if (fieldType.isAssignableFrom(String.class)) {
 						field.set(null, fieldValue);
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
-					}
-					// boolean field
-				} else if (fieldType.isAssignableFrom(Boolean.class)) {
-					try {
+
+						// boolean field
+					} else if (fieldType.isAssignableFrom(Boolean.class)) {
+
 						Boolean bValue = Boolean.valueOf(fieldValue);
 						field.set(null, bValue);
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
-					}
-					// int field
-				} else if (fieldType.isAssignableFrom(Integer.class)) {
-					try {
+
+						// int field
+					} else if (fieldType.isAssignableFrom(Integer.class)) {
+
 						Integer iValue = Integer.valueOf(fieldValue);
 						field.set(null, iValue);
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+
+					} else if (fieldType.isAssignableFrom(BrowserType.class)) {
+
+						field.set(null, BrowserType.valueOf(fieldValue));
+					} else {
+						log.debug("field : " + fieldName + " was not set.  field type = " + fieldType.getSimpleName()
+								+ " field value = " + fieldValue);
 					}
-				} else {
-					log.debug("field : " + fieldName + " was not set.  field type = " + fieldType.getSimpleName()
-							+ " field value = " + fieldValue);
+
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
 				}
 			}
-		}
 
+		}
 	}
 }
