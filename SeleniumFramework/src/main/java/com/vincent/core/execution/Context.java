@@ -2,6 +2,7 @@ package com.vincent.core.execution;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 
 import com.vincent.core.report.Report;
@@ -42,6 +43,14 @@ public class Context {
 
 	public void setDriver(WebDriver driver) {
 		this.driver = driver;
+	}
+
+	public String getData(String key) {
+		String value = stepData.get(key);
+		if (StringUtils.isBlank(value)) {
+			value = caseData.get(key);
+		}
+		return value;
 	}
 
 }

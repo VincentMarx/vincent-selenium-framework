@@ -1,13 +1,16 @@
 package com.vincent.core.execution;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openqa.selenium.WebDriver;
 
+import com.vincent.core.config.Config;
 import com.vincent.core.data.ExcelData;
 import com.vincent.core.page.PageLoader;
 import com.vincent.core.page.PageObject;
@@ -41,7 +44,7 @@ public class ExecutionService {
 		log.info("Number of test case to be executed: " + total);
 		for (TestCase testCase : testSet) {
 			if (testCase.isChecked()) {
-				log.info("Executing " + curTest + " test case : " + testCase.getTestCaseName());
+				log.info("Executing " + curTest++ + " test case : " + testCase.getTestCaseName());
 				if (!isStop.get()) {
 					Context context = new Context();
 					Report report = new Report(this.outputPath, testCase.getTestCaseName());
@@ -52,6 +55,20 @@ public class ExecutionService {
 						log.error(e.getMessage(), e);
 					}
 					testCase.setStatus(report.getTestCaseStatus());
+					// save report
+					report.setEndTime();
+					try {
+						report.save();
+					} catch (IOException e) {
+						log.error(e.getMessage(), e);
+					}
+					// close browser
+					if (Config.isCloseBrowserAtEnd) {
+						WebDriver driver = context.getDriver();
+						if (driver != null) {
+							driver.quit();
+						}
+					}
 				}
 			}
 		}
@@ -77,7 +94,6 @@ public class ExecutionService {
 				}
 			}
 		}
-
 	}
 
 	private void executeTestStep(TestStep testStep, Context context) throws Exception {
@@ -131,6 +147,7 @@ public class ExecutionService {
 		excelData.loadTestCase();
 
 		ExecutionService executionService = new ExecutionService(dataFilePath);
+		executionService.setOutputPath("output");
 
 		executionService.executeTestSet(excelData.getTestSet());
 

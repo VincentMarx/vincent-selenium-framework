@@ -34,7 +34,7 @@ public class Config {
 	public static String pagePackage = "com.test.page";
 
 	// for fire fox
-	public static String firefoxPath;
+	public static String firefoxPath = "D:/Program Files/Mozilla Firefox 32/firefox.exe";
 
 	public static String firefoxProfile = "firefoxProfile/exr6bzi9.testprofile";
 
@@ -52,7 +52,7 @@ public class Config {
 	public static String safariDriverPath = driverPath + "safaridriver.exe";
 
 	// driver implicitly wait timeout seconds
-	public static int implicitlyWaitTimeoutSeconds = 30;
+	public static long implicitlyWaitTimeoutSeconds = 30L;
 
 	// is close browser at the end of each test case
 	public static boolean isCloseBrowserAtEnd = true;

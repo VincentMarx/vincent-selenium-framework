@@ -43,4 +43,8 @@ public class RTestStep {
 		this.checkPoints.add(checkPoint);
 	}
 
+	public int checkPointIndex() {
+		return checkPoints.size() + 1;
+	}
+
 }

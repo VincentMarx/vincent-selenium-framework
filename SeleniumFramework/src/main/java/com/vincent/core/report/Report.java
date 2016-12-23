@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.thoughtworks.xstream.XStream;
 import com.vincent.core.testcase.Status;
+import com.vincent.core.util.DateUtil;
 
 public class Report {
 	private static final Log log = LogFactory.getLog(Report.class);
@@ -16,6 +17,13 @@ public class Report {
 	private String testCaseOutputPath;
 	private RTestCase testCase;
 	private RTestStep currentStep;
+
+	private static XStream xStream;
+
+	static {
+		xStream = new XStream();
+		xStream.setMode(XStream.NO_REFERENCES);
+	}
 
 	public Report(String outputPath, String testCaseName) {
 		this.testCaseOutputPath = outputPath + File.separator + testCaseName;
@@ -36,14 +44,14 @@ public class Report {
 
 	public void write(Status status, String remark) {
 		// take screen shot
-		String screenShot = ""; // TODO
+		String screenShot = getCurrentStepName() + "_" + checkPointIndex() + ".gif"; // TODO
 		log.info("Step : " + currentStep.getStepName() + ", " + status.name() + ", " + remark);
 		RCheckPoint checkPoint = new RCheckPoint(status, screenShot, remark);
 		this.currentStep.addCheckPoint(checkPoint);
 	}
 
 	public void save() throws IOException {
-		XStream xStream = new XStream();
+
 		String xml = xStream.toXML(testCase);
 		String xmlPath = new File(testCaseOutputPath).getAbsolutePath() + File.separator + "result.xml";
 		FileUtils.writeStringToFile(new File(xmlPath), xml);
@@ -51,6 +59,10 @@ public class Report {
 
 	public Status getCurrentStepStatus() {
 		return currentStep.getStatus();
+	}
+
+	public String getCurrentStepName() {
+		return currentStep.getStepName();
 	}
 
 	public String getTestCaseOutputPath() {
@@ -65,8 +77,16 @@ public class Report {
 		return testCase.getStatus();
 	}
 
+	public int checkPointIndex() {
+		return currentStep.checkPointIndex();
+	}
+
 	public void setTestCase(RTestCase testCase) {
 		this.testCase = testCase;
+	}
+
+	public void setEndTime() {
+		this.testCase.setEndTime(DateUtil.getCurrentDateTime());
 	}
 
 }
