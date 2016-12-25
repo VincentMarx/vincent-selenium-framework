@@ -36,7 +36,7 @@ public class Config {
 	// for fire fox
 	public static String firefoxPath = "D:/Program Files/Mozilla Firefox 32/firefox.exe";
 
-	public static String firefoxProfile = "firefoxProfile/exr6bzi9.testprofile";
+	public static String firefoxProfile = "selenium";
 
 	// for IE
 	public static String IEDriverPath = driverPath + "IEDriverServer.exe";

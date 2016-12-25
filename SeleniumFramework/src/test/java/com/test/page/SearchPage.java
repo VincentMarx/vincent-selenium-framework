@@ -34,7 +34,7 @@ public class SearchPage extends PageObject {
 		By byResultTable = By.xpath("//table[@id='resultTable']");
 		waitElement(byResultTable);
 		String expectedSize = this.getData("Size");
-		List<WebElement> rows = this.getRows(byResultTable);
+		List<WebElement> rows = this.getTableRows(byResultTable);
 		if (expectedSize.startsWith(">")) {
 			int size = Integer.valueOf(expectedSize.substring(1, expectedSize.length()));
 			this.report(rows.size() > size, "check result table.");

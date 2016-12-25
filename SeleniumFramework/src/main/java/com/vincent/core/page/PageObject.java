@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -20,6 +21,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
@@ -50,8 +52,10 @@ public abstract class PageObject {
 		WebElement field;
 		if (parent != null) {
 			field = parent.findElement(byField);
+			log.info("setValue | " + parent.toString() + " -> " + byField.toString() + ", value = " + value);
 		} else {
 			field = context.getDriver().findElement(byField);
+			log.info("setValue | " + byField.toString() + ", value = " + value);
 		}
 		if (field == null) {
 			log.error("field was not found! " + byField.toString());
@@ -74,12 +78,20 @@ public abstract class PageObject {
 		switch (Config.browserType) {
 		case Firefox:
 			// open firefox browser
-			// FirefoxProfile profile = new FirefoxProfile(new
-			// File(Config.firefoxProfile));
-			// driver = new FirefoxDriver(profile);
-			FirefoxBinary binary = new FirefoxBinary(new File(Config.firefoxPath));
-			FirefoxProfile profile = new FirefoxProfile();
-			driver = new FirefoxDriver(binary, profile);
+			if (StringUtils.isNotBlank(Config.firefoxProfile)) {
+				log.info("Open firefox with profile: " + Config.firefoxProfile);
+				ProfilesIni profiles = new ProfilesIni();
+				FirefoxProfile profile = profiles.getProfile(Config.firefoxProfile);
+				if (profile == null) {
+					log.error("firefox profile does not exist. profile name : = " + Config.firefoxProfile);
+				}
+				FirefoxBinary binary = new FirefoxBinary(new File(Config.firefoxPath));
+				driver = new FirefoxDriver(binary, profile);
+			} else {
+				log.info("Open firefox without profile");
+				driver = new FirefoxDriver();
+			}
+
 			break;
 		case IE:
 			// open IE browser
@@ -132,11 +144,12 @@ public abstract class PageObject {
 	}
 
 	protected void clickObject(By byObj) {
-		log.debug("clickObject | " + byObj.toString());
+		log.info("clickObject | " + byObj.toString());
 		context.getDriver().findElement(byObj).click();
 	}
 
-	protected List<WebElement> getRows(By byTable) {
+	protected List<WebElement> getTableRows(By byTable) {
+		log.info("getTableRows | " + byTable.toString());
 		WebElement table = findElement(byTable);
 		List<WebElement> rows = table.findElements(By.xpath("//tbody/tr"));
 		return rows;
@@ -148,15 +161,27 @@ public abstract class PageObject {
 
 	protected WebElement findElement(WebElement parent, By by) {
 		if (parent == null) {
+			log.info("findElement | " + by.toString());
 			return context.getDriver().findElement(by);
 		} else {
+			log.info("findElement | " + parent.toString() + " -> " + by.toString());
 			return parent.findElement(by);
 		}
 	}
 
 	protected boolean waitElement(By by) {
+		return waitElement(null, by);
+	}
+
+	protected boolean waitElement(WebElement parent, By by) {
 		try {
-			this.findElement(by);
+			if (parent == null) {
+				log.info("waitElement | " + by.toString());
+				context.getDriver().findElement(by);
+			} else {
+				log.info("waitElement | " + parent.toString() + " -> " + by.toString());
+				parent.findElement(by);
+			}
 			return true;
 		} catch (NoSuchElementException e) {
 			return false;
@@ -175,8 +200,9 @@ public abstract class PageObject {
 		File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		String stepName = context.getReport().getCurrentStepName();
 		int checkPointIndex = context.getReport().checkPointIndex();
-		String outputPath = context.getReport().getTestCaseOutputPath() + File.separator + stepName + "_"
-				+ checkPointIndex + ".gif";
+		String fileName = stepName + "_" + checkPointIndex + ".gif";
+		log.info("takeScreenshot | " + fileName);
+		String outputPath = context.getReport().getTestCaseOutputPath() + File.separator + fileName;
 		try {
 			FileUtils.copyFile(screenshotFile, new File(outputPath));
 		} catch (IOException e) {
