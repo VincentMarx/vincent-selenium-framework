@@ -3,7 +3,7 @@ package com.vincent.core.testcase;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TestStep {
+public class TestStep implements Test {
 	private String stepName;
 	private boolean isChecked = true;
 	private Status status;
@@ -26,6 +26,7 @@ public class TestStep {
 		return isChecked;
 	}
 
+	@Override
 	public void setChecked(boolean isChecked) {
 		this.isChecked = isChecked;
 	}
@@ -57,6 +58,19 @@ public class TestStep {
 		sb.append("                 status      = " + status + "\n");
 		sb.append("                 params      = " + params.toString() + "\n");
 		return sb.toString();
+	}
+
+	@Override
+	public Object getValueAt(int col) {
+		switch (col) {
+		case 0:
+			return isChecked;
+		case 1:
+			return stepName;
+		case 2:
+			return status;
+		}
+		return null;
 	}
 
 }

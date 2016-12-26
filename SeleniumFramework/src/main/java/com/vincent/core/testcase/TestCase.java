@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class TestCase {
+public class TestCase implements Test {
 	private String testCaseName;
 	private boolean isChecked = true;
 	private int runs;
@@ -29,6 +29,7 @@ public class TestCase {
 		return isChecked;
 	}
 
+	@Override
 	public void setChecked(boolean isChecked) {
 		this.isChecked = isChecked;
 	}
@@ -75,6 +76,21 @@ public class TestCase {
 			stepCounter++;
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public Object getValueAt(int col) {
+		switch (col) {
+		case 0:
+			return isChecked;
+		case 1:
+			return testCaseName;
+		case 2:
+			return runs;
+		case 3:
+			return status;
+		}
+		return null;
 	}
 
 }

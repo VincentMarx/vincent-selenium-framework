@@ -33,20 +33,17 @@ public class ExcelData {
 
 	private long lastModified = 0;
 
-	private List<TestCase> testSet;
+	private List<TestCase> testSet = new ArrayList<TestCase>();
 
-	public ExcelData(String dataFilePath) {
+	public void loadTestCase(String dataFilePath) {
 		this.dataFilePath = dataFilePath;
-		testSet = new ArrayList<TestCase>();
 		log.debug("dataFilePath : " + dataFilePath);
-	}
-
-	public void loadTestCase() {
 		File dataFile = new File(dataFilePath);
 		if (!dataFile.exists()) {
 			log.error("data file: " + dataFilePath + " does not exist.");
 		}
 		if (lastModified != dataFile.lastModified()) {
+			testSet.clear();
 			List<TestCase> testCaseList = loadTestCase(dataFile);
 			log.debug("Total number of TestCase : " + testCaseList.size());
 
@@ -58,8 +55,8 @@ public class ExcelData {
 					testCase.setStatus(testSet.get(index).getStatus());
 				}
 			}
-
 			testSet = testCaseList;
+			lastModified = dataFile.lastModified();
 		}
 	}
 
@@ -247,8 +244,8 @@ public class ExcelData {
 
 	public static void main(String[] args) {
 		String dataFilePath = "dataFiles/MavenCentralRepository.xls";
-		ExcelData excelData = new ExcelData(dataFilePath);
-		excelData.loadTestCase();
+		ExcelData excelData = new ExcelData();
+		excelData.loadTestCase(dataFilePath);
 		for (TestCase testCase : excelData.getTestSet()) {
 			System.out.println(testCase);
 		}

@@ -21,6 +21,8 @@ public class Config {
 
 	public static String dataPath = "";
 
+	public static String dataFileFolder = "dataFiles";
+
 	public static String outputRootPath = "output";
 
 	public static String driverPath = "driver/";

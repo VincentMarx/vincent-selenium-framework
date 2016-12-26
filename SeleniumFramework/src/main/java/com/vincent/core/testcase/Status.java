@@ -1,7 +1,7 @@
 package com.vincent.core.testcase;
 
 public enum Status {
-	Done, Pass, Warning, Fail, Fatal, Stop;
+	Awaiting, Running, Done, Pass, Warning, Fail, Fatal, Stop;
 
 	public static void main(String[] args) {
 		Status status = Status.valueOf("Warning");
