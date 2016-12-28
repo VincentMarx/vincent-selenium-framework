@@ -12,9 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class CheckBoxCellEditor extends DefaultCellEditor {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private Font font;

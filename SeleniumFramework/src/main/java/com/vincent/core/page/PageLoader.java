@@ -26,19 +26,19 @@ public class PageLoader {
 
 	private static void loadPages() {
 		PageClassLoader classLoader = new PageClassLoader();
-		pageMap = new HashMap<String, Class<?>>();
-		pageClassLastModifiedMap = new HashMap<String, Long>();
-		for (File classFile : new File(classFolder).listFiles(new FileFilter() {
-
-			@Override
-			public boolean accept(File file) {
-				if (file.getName().toLowerCase().endsWith(".class")) {
-
-					return true;
-				}
-				return false;
-			}
-		})) {
+		pageMap = new HashMap<>();
+		pageClassLastModifiedMap = new HashMap<>();
+		File[] classFiles = new File(classFolder).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return  file.getName().toLowerCase().endsWith(".class");
+            }
+        });
+		if (classFiles==null){
+		    log.warn("no .class file could be found in " + classFolder);
+		    return;
+        }
+		for (File classFile : classFiles) {
 			String fileName = StringUtils.substringBefore(classFile.getName(), ".");
 			long lastModified = classFile.lastModified();
 			pageClassLastModifiedMap.put(fileName, lastModified);
@@ -59,6 +59,7 @@ public class PageLoader {
 		Class<?> pageClass = pageMap.get(pageName);
 		if (pageClass == null) {
 			log.error("Page object : " + pageName + " was not found.");
+			return null;
 		}
 		PageObject pageObject = null;
 		try {
@@ -72,17 +73,22 @@ public class PageLoader {
 
 	private static void checkPageObjectUpdate() {
 		boolean flag = false;
-		for (File classFile : new File(classFolder).listFiles(new FileFilter() {
-
+		File classFolderFile = new File(classFolder);
+		if (!classFolderFile.exists()){
+			log.error("page class folder does not exist." + classFolder);
+			return;
+		}
+		File[] classFiles = classFolderFile.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				if (file.getName().toLowerCase().endsWith(".class")) {
-
-					return true;
-				}
-				return false;
+					return file.getName().toLowerCase().endsWith(".class");
 			}
-		})) {
+		});
+        if (classFiles == null){
+            log.error("no page class was found.");
+            return;
+        }
+		for (File classFile : classFiles) {
 			String fileName = StringUtils.substringBefore(classFile.getName(), ".");
 			Long lastModified = pageClassLastModifiedMap.get(fileName);
 			if (lastModified == null) {

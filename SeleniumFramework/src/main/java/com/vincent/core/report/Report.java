@@ -29,7 +29,9 @@ public class Report {
 		this.testCaseOutputPath = outputPath + File.separator + testCaseName;
 		File output = new File(this.testCaseOutputPath);
 		if (!output.exists()) {
-			output.mkdirs();
+			if(!output.mkdirs()){
+				log.error("fail to create output folder: " + testCaseOutputPath);
+			}
 		}
 		testCase = new RTestCase(testCaseName);
 		// copy js, css, template, xslt
@@ -37,7 +39,7 @@ public class Report {
 
 	public void addStep(String stepName) {
 		this.currentStep = new RTestStep(stepName);
-		testCase.addSteps(currentStep);
+		testCase.addStep(currentStep);
 		// create step node in xml
 
 	}

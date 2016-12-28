@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">  
-<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/' >
+<log4j:configuration >
 
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<errorHandler class="org.apache.log4j.helpers.OnlyOnceErrorHandler" />
@@ -23,18 +23,14 @@
 		</layout>
 	</appender>
 
-<!-- 	<appender name="activexAppender" class="org.apache.log4j.DailyRollingFileAppender"> -->
-<!-- 		<param name="File" value="E:/activex.log" />  -->
-<!-- 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />  -->
-<!-- 		<layout class="org.apache.log4j.PatternLayout"> -->
-<!-- 			<param name="ConversionPattern" value="[%d{MMdd HH:mm:ss SSS\} %-5p] [%t] %c{3\} - %m%n" /> -->
-<!-- 		</layout>  -->
-<!-- 	</appender> -->
+	<appender name="guiAppender" class="com.vincent.core.gui.GUILogAppender" />
 
-	<!-- <logger name="com.runway.bssp.activeXdemo" additivity="false"> -->
-		<!-- <priority value ="info"/>  -->
-		<!-- <appender-ref ref="activexAppender" />  -->
-	<!-- </logger> -->
+	<logger name="com.vincent.core" additivity="false">
+		<level value ="info"/> 
+		<appender-ref ref="guiAppender" /> 
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="fileAppender"/> 
+	</logger>
 
 	<root>
 		<level value ="INFO"/>

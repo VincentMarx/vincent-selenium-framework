@@ -18,7 +18,7 @@ public class GUILogAppender extends AppenderSkeleton {
 
 	public static JTextPane text = new JTextPane();
 	public static Document doc = text.getDocument();
-	public static SimpleAttributeSet attr = new SimpleAttributeSet();
+	public static final SimpleAttributeSet attr = new SimpleAttributeSet();
 
 	@Override
 	public void close() {
@@ -47,6 +47,9 @@ public class GUILogAppender extends AppenderSkeleton {
 		synchronized (attr) {
 			try {
 				StyleConstants.setBackground(attr, c);
+				if (doc.getLength() > 20000) {
+					doc.remove(0, 1000);
+				}
 				doc.insertString(doc.getLength(), s, attr);
 			} catch (BadLocationException e) {
 

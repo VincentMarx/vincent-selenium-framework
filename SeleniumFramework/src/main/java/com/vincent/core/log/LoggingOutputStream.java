@@ -129,7 +129,6 @@ public class LoggingOutputStream extends OutputStream {
 				out = FileUtils.openOutputStream(new File("LoggingOutputStream_error.txt"));
 				t.printStackTrace(new PrintStream(out));
 			} catch (Throwable t2) {
-
 			} finally {
 				if (out != null) {
 					try {

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -31,48 +32,116 @@ import com.vincent.core.testcase.Status;
 
 public abstract class PageObject {
 	protected static final Log log = LogFactory.getLog(PageObject.class);
-	protected Context context;
+	private static final String BLANK = "<BLANK>";
+	private Context context;
 
-	protected boolean setValue(String fieldName, String value) {
-		try {
+    /**
+     * <p>Set value to a text field, i.e. input, textarea. </p>
+     *
+     * <p>If the text field was not found, will throw exception</p>
+     *
+     * <pre>
+     * setValue(field, ""), nothing will be done
+     * setValue(field, null), nothing will be done
+     * setValue(field, "<BLANK>"), will clear the field
+     * setValue(field, "abc"), "abc" will be set to field
+     * </pre>
+     *
+     * @param fieldName  method name of a subclass of this class which represents a field (return By object).
+     * @param value  String to be set to the field.
+     */
+	protected void setValue(String fieldName, String value) throws Exception{
 			By by = getBy(fieldName);
-			return setValue(by, value);
-		} catch (Exception e) {
-			log.error("field " + fieldName + " was not defined.");
-			log.error(e.getMessage(), e);
-			return false;
-		}
+			setValue(by, value);
 	}
 
-	protected boolean setValue(By byField, String value) {
-		return setValue(null, byField, value);
+    /**
+     * <p>Set value to a text field, i.e. input, textarea. </p>
+     *
+     * <p>If the text field was not found, will throw exception</p>
+     *
+     * <pre>
+     * setValue(field, ""), nothing will be done
+     * setValue(field, null), nothing will be done
+     * setValue(field, "<BLANK>"), will clear the field
+     * setValue(field, "abc"), "abc" will be set to field
+     * </pre>
+     *
+     * @param byField  Instance of By which represents a field
+     * @param value  String to be set to the field.
+     */
+	protected void setValue(By byField, String value) {
+		setValue(null, byField, value);
 	}
 
-	protected boolean setValue(WebElement parent, By byField, String value) {
+    /**
+     * <p>Set value to a text field, i.e. input, textarea. </p>
+     *
+     * <p>If the text field was not found, will throw exception</p>
+     *
+     * <pre>
+     * setValue(parent, field, ""), nothing will be done
+     * setValue(parent, field, null), nothing will be done
+     * setValue(parent, field, "<BLANK>"), will clear the field
+     * setValue(parent, field, "abc"), "abc" will be set to field
+     * </pre>
+     *
+     ** @param parent  Parent element to find the field, if null, will find the field at root element.
+     * @param byField  Instance of By which represents a field
+     * @param value  String to be set to the field.
+     */
+	protected void setValue(WebElement parent, By byField, String value) {
+        log.info("setValue | " + toString(parent, byField));
+        if (value==null || "".equals(value)){
+            return;
+        }
 		WebElement field;
 		if (parent != null) {
 			field = parent.findElement(byField);
-			log.info("setValue | " + parent.toString() + " -> " + byField.toString() + ", value = " + value);
 		} else {
 			field = context.getDriver().findElement(byField);
-			log.info("setValue | " + byField.toString() + ", value = " + value);
 		}
-		if (field == null) {
-			log.error("field was not found! " + byField.toString());
-		}
-		return setValue(field, value);
+		setValue(field, value);
 	}
 
-	protected boolean setValue(WebElement field, String value) {
+    /**
+     * <p>Set value to a text field, i.e. input, textarea. </p>
+     *
+     * <p>If the text field was not found, will throw exception</p>
+     *
+     * <pre>
+     * setValue(field, ""), nothing will be done
+     * setValue(field, null), nothing will be done
+     * setValue(field, "<BLANK>"), will clear the field
+     * setValue(field, "abc"), "abc" will be set to field
+     * </pre>
+     *
+     * @param field  Instance of WebElement which represents a field
+     * @param value  String to be set to the field.
+     */
+	protected void setValue(WebElement field, String value) {
+        if (value==null || "".equals(value)){
+            return;
+        }
 		field.clear();
-		field.sendKeys(value);
-		return true;
+		if (!BLANK.equalsIgnoreCase(value)){
+            field.sendKeys(value);
+        }
 	}
 
-	/*
-	 * Open a new browser
-	 */
-
+    /**
+     * <p>Init WebDriver according to the values in config file </p>
+     *
+     * <pre>
+     * Config.browserType=Firefox, will init FirefoxDriver, if Config.firefoxProfile is specified, will init FirefoxDriver with that profile
+     * Config.browserType=IE, will init InternetExplorerDriver
+     * Config.browserType=Chrome, will init ChromeDriver
+     * Config.browserType=Safari, will init SafariDriver
+     * </pre>
+     *
+     * @param isInit  no use in this version
+     * @return new WebDriver instance
+     */
 	protected WebDriver newDriver(final boolean isInit) {
 		WebDriver driver = null;
 		switch (Config.browserType) {
@@ -113,6 +182,14 @@ public abstract class PageObject {
 		return driver;
 	}
 
+    /**
+     * <p>Get test data</p>
+     *
+     * <p>The test data in data file of each step will be loaded to map</p>
+     *
+     * @param key  key of the data value
+     * @return data value of the key
+     */
 	protected String getData(String key) {
 		return context.getData(key);
 	}
@@ -125,15 +202,37 @@ public abstract class PageObject {
 		this.context = context;
 	}
 
-	protected String getValue(String fieldName) {
-		return context.getStepData().get(fieldName);
-	}
-
+    /**
+     * <p>Report status of a check point</p>
+     *
+     * <p>this method should be used after verifying something, i.e.</p>
+     *
+     * <pre>
+     * public void verifyAccountName(){
+     *     String actualName = nameField.getText();
+     *     String expectedName = getData("ExpectedName");
+     *     if (actualName.equalsIgnoreCase(expectedName)){
+     *         report(Status.Pass, "check account name passed");
+     *     }
+     * }
+     * </pre>
+     *
+     * @param status  status of the check point
+     * @param remark  remark of the check point
+     */
 	protected void report(Status status, String remark) {
 		takeScreenshot();
 		context.getReport().write(status, remark);
 	}
 
+    /**
+     * <p>Report status of a check point</p>
+     *
+     * <p>See {@link #report(Status status, String remark)} </p>
+     *
+     * @param flag  if true status = Pass, else status = Fail
+     * @param remark  remark of the check point
+     */
 	protected void report(boolean flag, String remark) {
 		takeScreenshot();
 		if (flag) {
@@ -143,43 +242,67 @@ public abstract class PageObject {
 		}
 	}
 
+    /**
+     * <p>Click an element, i.e. link, button, etc</p>
+     *
+     * @param byObj  instance of By represents the object to be clicked
+     */
 	protected void clickObject(By byObj) {
 		log.info("clickObject | " + byObj.toString());
 		context.getDriver().findElement(byObj).click();
 	}
 
+    /**
+     * <p>Get rows on a web table</p>
+     *
+     * @param byTable  instance of By represents the web table
+     * @return List of row elements
+     * @throws org.openqa.selenium.NoSuchElementException
+     */
 	protected List<WebElement> getTableRows(By byTable) {
 		log.info("getTableRows | " + byTable.toString());
 		WebElement table = findElement(byTable);
-		List<WebElement> rows = table.findElements(By.xpath("//tbody/tr"));
-		return rows;
+		return table.findElements(By.xpath("//tbody/tr"));
 	}
 
 	protected WebElement findElement(By by) {
 		return findElement(null, by);
 	}
 
+    /**
+     * <p>Find element represented by param 'by' in parent element</p>
+     *
+     * @param parent  parent element of the element being found.  If null, find the element in root element.
+     * @param by the element being found
+     * @return a WebElement
+     * @throws org.openqa.selenium.NoSuchElementException
+     */
 	protected WebElement findElement(WebElement parent, By by) {
+        log.info("findElement | " + toString(parent, by));
 		if (parent == null) {
-			log.info("findElement | " + by.toString());
 			return context.getDriver().findElement(by);
 		} else {
-			log.info("findElement | " + parent.toString() + " -> " + by.toString());
 			return parent.findElement(by);
 		}
 	}
 
+    /**
+     * <p>Find element represented by param 'by' in root element</p>
+     *
+     * @param by the element being found
+     * @return a WebElement
+     * @throws org.openqa.selenium.NoSuchElementException
+     */
 	protected boolean waitElement(By by) {
 		return waitElement(null, by);
 	}
 
 	protected boolean waitElement(WebElement parent, By by) {
+	    log.info("waitElement | " + toString(parent, by));
 		try {
 			if (parent == null) {
-				log.info("waitElement | " + by.toString());
 				context.getDriver().findElement(by);
 			} else {
-				log.info("waitElement | " + parent.toString() + " -> " + by.toString());
 				parent.findElement(by);
 			}
 			return true;
@@ -209,5 +332,13 @@ public abstract class PageObject {
 			log.error(e.getMessage(), e);
 		}
 	}
+
+	private String toString(WebElement parent, By byField){
+	    if (parent==null){
+	        return byField.toString();
+        } else {
+	        return parent.toString() + " -> " + byField.toString();
+        }
+    }
 
 }

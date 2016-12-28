@@ -8,6 +8,9 @@ import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.SwingUtilities;
 
+/**
+ * <p>a check box inside an icon, to display a check box in the header of a JTable</p>
+ */
 public class CheckBoxIcon implements Icon {
 	private final JCheckBox checkbox;
 

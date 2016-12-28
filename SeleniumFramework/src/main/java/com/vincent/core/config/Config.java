@@ -48,10 +48,10 @@ public class Config {
 
 	public static String chromeOrg;
 
-	public static String chromeDriverPath = driverPath + "chromedriver.exe";
+	public static String chromeDriverPath = driverPath + "ChromeDriver.exe";
 
 	// for safari
-	public static String safariDriverPath = driverPath + "safaridriver.exe";
+	public static String safariDriverPath = driverPath + "SafariDriver.exe";
 
 	// driver implicitly wait timeout seconds
 	public static long implicitlyWaitTimeoutSeconds = 30L;

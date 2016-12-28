@@ -19,7 +19,7 @@ public class SearchPage extends PageObject {
 		return By.xpath("//input[@id='queryButton']");
 	}
 
-	public void input() {
+	public void input() throws Exception{
 		WebDriver driver = this.newDriver(false);
 		driver.get("http://search.maven.org/");
 		this.setValue("bySearchText", getData("SearchText"));

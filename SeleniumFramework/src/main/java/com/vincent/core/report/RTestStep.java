@@ -12,7 +12,7 @@ public class RTestStep {
 
 	public RTestStep(String stepName) {
 		this.stepName = stepName;
-		this.checkPoints = new ArrayList<RCheckPoint>();
+		this.checkPoints = new ArrayList<>();
 	}
 
 	public String getStepName() {
@@ -24,9 +24,16 @@ public class RTestStep {
 	}
 
 	public Status getStatus() {
+		// if the test step status haven't been set yet, set it to minimum value of Status.
+		// test step status will be updated according to status of check point status.
 		if (status == null) {
-			status = Status.Done;
+		    if (checkPoints.size()==0){
+                status = Status.Done;
+            } else {
+                status = Status.Awaiting;
+            }
 		}
+
 		for (RCheckPoint checkPoint : checkPoints) {
 			if (checkPoint.getStatus().compareTo(status) > 0) {
 				status = checkPoint.getStatus();

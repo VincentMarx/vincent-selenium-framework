@@ -10,21 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -42,14 +28,14 @@ public class Console {
 	private static Log log = LogFactory.getLog(Console.class);
 
 	private JFrame frame = new JFrame("Automation Framework");
-	private Font font = new Font("Courier New", 0, 12);
-
-	private String[] testCaseTableHeaders = new String[] { "SN", "Test Case Name", "Runs", "Status" };
+	private static final Font font = new Font("Courier New", 0, 12);
+	private static final String[] testCaseTableHeaders = new String[] { "SN", "Test Case Name", "Runs", "Status" };
+	private static final String[] testStepTableHeaders = new String[] { "SN", "Test Step Name", "Status" };
 	private TestTableModel testCaseModel;
 	private JTable testCaseTable;
 	private JCheckBox selectAllCase = new JCheckBox();
 
-	private String[] testStepTableHeaders = new String[] { "SN", "Test Step Name", "Status" };
+
 	private TestTableModel testStepModel;
 	private JTable testStepTable;
 	private JCheckBox selectAllStep = new JCheckBox();
@@ -74,7 +60,7 @@ public class Console {
 		log.info("init console UI");
 		frame.setSize(900, 700);
 		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 
 		testCaseModel = new TestTableModel(testCaseTableHeaders);
@@ -84,7 +70,7 @@ public class Console {
 
 			@Override
 			public String getToolTipText(final MouseEvent e) {
-				int column = this.columnAtPoint(e.getPoint());
+				//int column = this.columnAtPoint(e.getPoint());
 				return super.getToolTipText();
 			}
 
@@ -230,6 +216,8 @@ public class Console {
 		public void actionPerformed(ActionEvent e) {
 			Console.this.service = new ExecutionService();
 			new NewTestDialog(Console.this.frame, "New Test", true, Console.this.service);
+			Console.this.frame
+					.setTitle(Console.this.frame.getTitle() + "    " + Console.this.service.getDataFilePath());
 			Console.this.testCaseModel.setTestList(service.getTestSet());
 			Console.this.testCaseModel.fireTableDataChanged();
 			resizeColumnWidth(Console.this.testCaseTable);
@@ -343,9 +331,9 @@ public class Console {
 			this.runMode = runMode;
 		}
 
-		public static final String RUN_TEST_SET = "RunTestSet";
-		public static final String RUN_TEST_CASE = "RunTestCase";
-		public static final String RUN_TEST_CASE_STEP_BY_STEP = "RunTestCaseStepByStep";
+		static final String RUN_TEST_SET = "RunTestSet";
+		static final String RUN_TEST_CASE = "RunTestCase";
+		static final String RUN_TEST_CASE_STEP_BY_STEP = "RunTestCaseStepByStep";
 
 		@Override
 		public void run() {
@@ -473,7 +461,7 @@ public class Console {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					Console console = new Console();
+					new Console();
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}

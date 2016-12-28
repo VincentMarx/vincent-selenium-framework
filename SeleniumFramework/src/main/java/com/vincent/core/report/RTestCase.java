@@ -16,7 +16,7 @@ public class RTestCase {
 	public RTestCase(String testCaseName) {
 		this.testCaseName = testCaseName;
 		this.startTime = DateUtil.getCurrentDateTime();
-		testSteps = new ArrayList<RTestStep>();
+		testSteps = new ArrayList<>();
 	}
 
 	public String getTestCaseName() {
@@ -39,7 +39,7 @@ public class RTestCase {
 		return testSteps;
 	}
 
-	public void addSteps(RTestStep step) {
+	public void addStep(RTestStep step) {
 		testSteps.add(step);
 	}
 
@@ -52,9 +52,12 @@ public class RTestCase {
 	}
 
 	public Status getStatus() {
-		if (status == null) {
-			status = Status.Done;
+		// if the test case status haven't been set yet, set it to minimum value of Status.
+		// test case status will be updated according to status of test step status.
+		if (status == null){
+			status = Status.Awaiting;
 		}
+		// a test case should have at least 1 test step
 		for (RTestStep testStep : testSteps) {
 			if (testStep.getStatus().compareTo(status) > 0) {
 				status = testStep.getStatus();

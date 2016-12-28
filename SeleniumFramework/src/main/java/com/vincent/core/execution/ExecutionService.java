@@ -18,6 +18,9 @@ import com.vincent.core.testcase.Status;
 import com.vincent.core.testcase.TestCase;
 import com.vincent.core.testcase.TestStep;
 
+/**
+ *
+ */
 public class ExecutionService {
 	private static final Log log = LogFactory.getLog(ExecutionService.class);
 
@@ -41,7 +44,9 @@ public class ExecutionService {
 		// TODO copy js, css, report template to outputPath
 		File output = new File(this.outputPath);
 		if (!output.exists()) {
-			output.mkdirs();
+			if (!output.mkdirs()){
+			    log.error("Fail to create folder: " + this.outputPath);
+            }
 		}
 	}
 
