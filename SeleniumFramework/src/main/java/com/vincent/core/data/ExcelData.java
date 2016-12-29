@@ -188,9 +188,7 @@ public class ExcelData {
 
 					TestStep testStep = new TestStep(testStepName);
 
-					int stepHeaderRowNum = startRow; // init stepHeaderRow =
-														// start
-														// row
+					int stepHeaderRowNum = startRow;
 					// check if above row is step header row
 					Row stepHeaderRow = sh.getRow(rowNum - 1);
 					if (stepHeaderRow != null) {
